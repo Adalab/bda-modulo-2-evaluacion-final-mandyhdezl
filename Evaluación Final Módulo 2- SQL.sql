@@ -23,9 +23,13 @@ SELECT DISTINCT title AS Nombre_Pelicula
 
 SELECT *
 	FROM film;
+     
+SELECT title AS  Nombre_Pelicula, rating AS Clasificacion  -- 1er view --
+	FROM film
+	WHERE rating = "PG-13";
     
 -- ✅ query solución --    
-SELECT title AS  Nombre_Pelicula, rating AS Clasificacion
+SELECT title AS  Nombre_Pelicula
 	FROM film
 	WHERE rating = "PG-13";
     
@@ -38,6 +42,7 @@ SELECT *
 SELECT title AS Nombre_Pelicula, description AS Descripcion
 	FROM film
     WHERE description LIKE "%amazing%";
+    
     
 -- 4. Encuentra el título de todas las películas que tengan una duración mayor a 120 minutos --
 SELECT *
@@ -89,7 +94,7 @@ SELECT title AS Titulo, rating AS Clasificacion
     WHERE rating NOT LIKE "R" AND  "PG-13"; -- no me funciona porque sigue mostrando los "PG-13" --
 
 -- ✅ query solución --    
-SELECT title AS Titulo, rating AS Clasificacion
+SELECT title AS Nombre_Pelicula
 	FROM film
     WHERE rating NOT LIKE "R" AND rating NOT LIKE "PG-13"; 
     
@@ -120,7 +125,7 @@ SELECT c.customer_id AS ID_Cliente, c.first_name AS Nombre, c.last_name AS Apell
     LEFT JOIN rental AS r
     USING (customer_id)
     GROUP BY c.customer_id;
--- 👆 esta sentencia me daba error en el group by. Este count con left join me podia contar las filas vacías --	    
+-- 👆 esta sentencia me daba error en el group by. Este count sin especificar, teniendo left join me podia contar las filas vacías --	    
     
     
 -- ✅ query solución --	    
@@ -232,7 +237,7 @@ SELECT a.first_name, a.last_name, f.title -- 1er view del output--
     
     
 -- ✅ query solución --	    
-SELECT a.first_name AS Nombre, a.last_name AS Apellido, f.title  AS Pelicula
+SELECT a.first_name AS Nombre, a.last_name AS Apellido
 	FROM actor AS a
     INNER JOIN film_actor AS f_c
     USING (actor_id)
@@ -246,7 +251,7 @@ SELECT *
 	FROM film;
 
 -- ✅ query solución --	
-SELECT title AS Pelicula, description AS Descripcion 
+SELECT title AS Nombre_Pelicula
 	FROM film
     WHERE description LIKE "dog%" OR description LIKE "cat%";
     
@@ -260,7 +265,7 @@ SELECT *
 
 
 -- ✅ query solución --
-SELECT a.first_name AS Nombre, a.last_name AS Apellido, f.title  AS Pelicula -- 1er view del output: lo dejo así a pesar de que podría resolverlo sin incluir la tabla film--
+SELECT a.first_name AS Nombre, a.last_name AS Apellido, f.title  AS Nombre_Pelicula -- 1er view del output: lo dejo así a pesar de que podría resolverlo sin incluir la tabla film--
 	FROM actor AS a
     LEFT JOIN film_actor AS f_c
     USING (actor_id)
@@ -277,9 +282,8 @@ SELECT title AS Titulo, release_year AS Año_Lanzamiento -- esto lo resuelve per
 	FROM film
 	WHERE release_year >= 2005 AND release_year <= 2010;
 
-
 -- ✅ query solución --	
-SELECT title AS Titulo, release_year AS Año_Lanzamiento -- hago el intento con between y me da el mismo output. me quedo con esta sentencia porque hace mas sentido con el enunciado---
+SELECT title AS Nombre_Pelicula -- hago el intento con between y me da el mismo output. me quedo con esta sentencia porque hace mas sentido con el enunciado---
 FROM film
 WHERE release_year BETWEEN 2005 AND 2010;
 
@@ -294,7 +298,6 @@ SELECT *
 SELECT *
 	FROM film;   
     
-    
 SELECT f.title, c.name -- 1er view del output --
 	FROM film AS f
     INNER JOIN film_category AS f_c
@@ -305,7 +308,7 @@ SELECT f.title, c.name -- 1er view del output --
     
     
 -- ✅ query solución --  
-SELECT f.title AS Titulo -- elimino la vista de la categoria para estar mas acorde con lo que pide el anunciado --
+SELECT f.title AS Nombre_Pelicula -- elimino la vista de la categoria para estar mas acorde con lo que pide el anunciado --
 	FROM film AS f
     INNER JOIN film_category AS f_c
     USING (film_id)
@@ -332,12 +335,13 @@ SELECT a.first_name AS Nombre, a.last_name AS Apellido, COUNT(film_id) AS Total_
 	HAVING COUNT(film_id) > 10;
 
 -- ✅ query solución -- 
-SELECT a.first_name AS Nombre, a.last_name AS Apellido -- corrijo el where que no sirve para darme la info que quiero y corrijo el select-
+SELECT a.first_name AS Nombre, a.last_name AS Apellido --  corrijo el select-
 	FROM actor AS a
 	INNER JOIN film_actor AS f_c 
     USING (actor_id)
 	GROUP BY a.first_name, a.last_name
 	HAVING COUNT(film_id) > 10;
+
 
 -- 19. Encuentra el titulo de todas las pelis que son "R" y tienen una duracion mayor a 2 horas, tabla film --
 SELECT *
@@ -348,7 +352,7 @@ SELECT title AS Titulo, rating, length -- 1er View para validar--
     WHERE rating = "r" AND length > 120;
     
 -- ✅ query solución --   
-SELECT title AS Titulo -- Dejo solo el titulo de la peli en el select para estar mas acorde con el anunciado--
+SELECT title AS Nombre_Pelicula -- Dejo solo el titulo de la peli en el select para estar mas acorde con el anunciado--
 	FROM film
     WHERE rating = "r" AND length > 120;
 
@@ -431,9 +435,7 @@ SELECT title AS Pelicula, rental_duration AS Tiempo_Alquiler  -- 3ra consulta--
 ORDER BY title;
 
     
-
--- ✅ query solución --
-SELECT title AS Pelicula  -- corrección del where en la subconsulta para usar la tabla soliciada en el enunciado  --
+SELECT title AS Nombre_Pelicula  							 -- 4ta consulta --
 	FROM film
     WHERE rental_duration IN (SELECT f.rental_duration 
 									FROM rental AS r
@@ -444,5 +446,121 @@ SELECT title AS Pelicula  -- corrección del where en la subconsulta para usar l
 									WHERE DATEDIFF(r.return_date, r.rental_date) > 5)
 ORDER BY title;
   
+  
+-- ✅ query solución --   
+SELECT title AS Nombre_Pelicula	  -- corrijo para usar film_id en la subconsulta y buscar los film_id de películas que han sido alquiladas más de 5 días. Distinct para no extraer las que fueron alquiladas mas de 1 vez --
+FROM film
+WHERE film_id IN (
+    SELECT DISTINCT i.film_id
+    FROM rental AS r
+    INNER JOIN inventory AS i USING (inventory_id)
+    WHERE DATEDIFF(r.return_date, r.rental_date) > 5
+)
+ORDER BY title;
 
--- 23. 
+
+
+-- 23. Nombre y apellido de actores que no han actuado en ninguna peli de Horror. Subconsulta para encontrar actorea que han actuado en pelis de la categoria horror y excluyelos de la lista de actores --
+SELECT *
+	FROM film_category;
+    
+SELECT a.first_name, a.last_name, c.name  		 -- 1ra consulta --
+	FROM actor AS a
+    LEFT JOIN film_actor AS f_a
+    USING (actor_id)
+    LEFT JOIN film AS f
+    USING (film_id)
+    LEFT JOIN film_category AS f_c
+    USING (film_id)
+    LEFT JOIN category AS c
+    USING (category_id)
+    WHERE c.name NOT IN ("Horror");
+
+SELECT a.first_name, a.last_name, c.name  		 -- 2da consulta --
+	FROM actor AS a
+    LEFT JOIN film_actor AS f_a
+    USING (actor_id)
+    LEFT JOIN film AS f
+    USING (film_id)
+    LEFT JOIN film_category AS f_c
+    USING (film_id)
+    LEFT JOIN category AS c
+    USING (category_id)
+    WHERE c.name = "Horror";
+    
+    SELECT a.first_name, a.last_name, c.name  		  -- 3ra consulta -- muy reduntante para hacer una sunconsulta. Aparte que revisando la 1ra consula, NOT IN "Horror" no excluye completamente a los actores que han participado en "Horror"
+	FROM actor AS a
+    LEFT JOIN film_actor AS f_a
+    USING (actor_id)
+    LEFT JOIN film AS f
+    USING (film_id)
+    LEFT JOIN film_category AS f_c
+    USING (film_id)
+    LEFT JOIN category AS c
+    USING (category_id)
+    WHERE (
+				SELECT c.name	 
+				FROM actor AS a
+				LEFT JOIN film_actor AS f_a
+				USING (actor_id)
+				LEFT JOIN film AS f
+				USING (film_id)
+				LEFT JOIN film_category AS f_c
+				USING (film_id)
+				LEFT JOIN category AS c
+				USING (category_id)
+				WHERE c.name = "Horror");	
+                
+                
+ SELECT a.first_name, a.last_name  		 -- 4ta consulta --
+	FROM actor AS a
+    WHERE actor_id NOT IN (
+			SELECT c.name	 
+				FROM actor AS a
+				LEFT JOIN film_actor AS f_a
+				USING (actor_id)
+				LEFT JOIN film AS f
+				USING (film_id)
+				LEFT JOIN film_category AS f_c
+				USING (film_id)
+				LEFT JOIN category AS c
+				USING (category_id)
+				WHERE c.name = "Horror");	                
+    
+                
+-- ✅ query solución --              -- elimino la tabla category para trabajar con los actor_id que han participado en películas de la categoría "Horror". Selecciono Distinct para evitar ids duplicados--
+SELECT a.first_name AS Nombre, a.last_name AS Apellido
+	FROM actor AS a
+	WHERE actor_id NOT IN (
+		SELECT DISTINCT f_a.actor_id
+		FROM film_actor AS f_a
+		INNER JOIN film_category AS f_c 
+		USING (film_id)
+		INNER JOIN category AS c 
+		USING (category_id)
+		WHERE c.name = 'Horror');
+
+
+-- 24-  Encuentra el título de las películas que son comedias y tienen una duración mayor a 180 minutos en la tabla film --
+SELECT *
+	FROM category;
+    
+SELECT *
+	FROM film;
+
+SELECT f.title AS Titulo, f.length     -- 1er view"
+	FROM film AS f
+    INNER JOIN film_category AS f_c
+    USING (film_id)
+    INNER JOIN category AS c
+    USING (category_id)
+    WHERE c.name = "Comedy" AND f.length > 180;
+
+-- ✅ query solución -- 
+SELECT f.title AS Nombre_Pelicula
+	FROM film AS f
+    INNER JOIN film_category AS f_c
+    USING (film_id)
+    INNER JOIN category AS c
+    USING (category_id)
+    WHERE c.name = "Comedy" AND f.length > 180;
