@@ -183,3 +183,104 @@ SELECT  c.name AS Categoria, COUNT(r.rental_id) AS Total_Alquileres
     USING (category_id)
     GROUP BY c.name;
 
+
+-- 12. promedio de duracion de las pelis para cada clasificacion de la tabla film. muestra la clasificacion junto con el promedio de duracion --
+SELECT *
+	FROM film; 
+    
+SELECT *
+	FROM category; 
+    
+SELECT *
+	FROM film_category; 
+    
+    
+SELECT c.name, f.length -- 1er view de lo que obtengo -- 
+	FROM category AS c
+    INNER JOIN film_category AS f_c
+    USING (category_id)
+    INNER JOIN film AS f
+    USING (film_id);
+    
+-- ✅ query solución --	 
+ SELECT c.name AS Categoria, AVG(f.length) AS Promedio_duracion  
+	FROM category AS c
+    INNER JOIN film_category AS f_c
+    USING (category_id)
+    INNER JOIN film AS f
+    USING (film_id)
+    GROUP BY c.name;   
+    
+    
+-- 13. nombre y apellido de los actores en la pelicula  "indian love" --
+SELECT *
+	FROM actor;
+    
+SELECT *
+	FROM film;
+    
+SELECT *
+	FROM film_actor;   
+    
+
+SELECT a.first_name, a.last_name, f.title -- 1er view del output--
+	FROM actor AS a
+    INNER JOIN film_actor AS f_c
+    USING (actor_id)
+    INNER JOIN film AS f
+    USING (film_id);
+    
+    
+-- ✅ query solución --	    
+SELECT a.first_name AS Nombre, a.last_name AS Apellido, f.title  AS Pelicula
+	FROM actor AS a
+    INNER JOIN film_actor AS f_c
+    USING (actor_id)
+    INNER JOIN film AS f
+    USING (film_id)
+    WHERE title = "INDIAN LOVE";
+    
+
+-- 14. titulo de todas las pelis que tienen la palabra "dog" o "cat" en la desc.
+SELECT *
+	FROM film;
+
+-- ✅ query solución --	
+SELECT title AS Pelicula, description AS Descripcion 
+	FROM film
+    WHERE description LIKE "dog%" OR description LIKE "cat%";
+    
+
+-- 15. Hay algún actor o actriz que no aparezca en ninguna película en la tabla film_actor.--
+SELECT *
+	FROM actor;
+    
+SELECT *
+	FROM film_actor;
+
+
+-- ✅ query solución --
+SELECT a.first_name AS Nombre, a.last_name AS Apellido, f.title  AS Pelicula -- 1er view del output: lo dejo así a pesar de que podría resolverlo sin incluir la tabla film--
+	FROM actor AS a
+    LEFT JOIN film_actor AS f_c
+    USING (actor_id)
+    LEFT JOIN film AS f
+    USING (film_id)
+    WHERE film_id IS NULL;
+
+
+-- 16. Encuentra el título de todas las películas que fueron lanzadas entre el año 2005 y 2010 --
+SELECT *
+	FROM film;
+
+SELECT title AS Titulo, release_year AS Año_Lanzamiento -- esto lo resuelve pero me pica que hemos visto un between en algun momento --
+	FROM film
+	WHERE release_year >= 2005 AND release_year <= 2010;
+
+
+-- ✅ query solución --	
+SELECT title AS Titulo, release_year AS Año_Lanzamiento -- hago el intento con between y me da el mismo output---
+FROM film
+WHERE release_year BETWEEN 2005 AND 2010;
+
+
