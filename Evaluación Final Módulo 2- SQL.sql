@@ -104,8 +104,8 @@ SELECT COUNT(rating) AS Total_Peliculas, rating AS Clasificacion -- asi es como 
 
 -- ✅ query solución	
 SELECT rating AS Clasificacion, COUNT(*) AS Total_Peliculas -- luego me di cuenta que el orden del select se podía mejorar para hacer más sentido --
-FROM film
-GROUP BY rating;
+	FROM film
+	GROUP BY rating;
 
 
 -- 10. cantidad total de películas alquiladas por cada cliente mostrando id de cliente, nombre y apellido junto con la cantidad de pelis alquiladas --
@@ -125,9 +125,9 @@ SELECT c.customer_id AS ID_Cliente, c.first_name AS Nombre, c.last_name AS Apell
     
 -- ✅ query solución --	    
 SELECT c.customer_id AS ID_Cliente, c.first_name AS Nombre, c.last_name AS Apellido, COUNT(r.rental_id) AS Total_Peliculas
-FROM customer AS c
-LEFT JOIN rental AS r USING (customer_id)
-GROUP BY c.customer_id, c.first_name, c.last_name;
+	FROM customer AS c
+	LEFT JOIN rental AS r USING (customer_id)
+	GROUP BY c.customer_id, c.first_name, c.last_name;
 
     
 -- 11. total de peliculas alquiladas por categoría. muestra nombre de la categoria y recuento de alquileres -- 	  
@@ -273,14 +273,176 @@ SELECT a.first_name AS Nombre, a.last_name AS Apellido, f.title  AS Pelicula -- 
 SELECT *
 	FROM film;
 
-SELECT title AS Titulo, release_year AS Año_Lanzamiento -- esto lo resuelve pero me pica que hemos visto un between en algun momento --
+SELECT title AS Titulo, release_year AS Año_Lanzamiento -- esto lo resuelve pero me pica que hemos visto el between en algun momento --
 	FROM film
 	WHERE release_year >= 2005 AND release_year <= 2010;
 
 
 -- ✅ query solución --	
-SELECT title AS Titulo, release_year AS Año_Lanzamiento -- hago el intento con between y me da el mismo output---
+SELECT title AS Titulo, release_year AS Año_Lanzamiento -- hago el intento con between y me da el mismo output. me quedo con esta sentencia porque hace mas sentido con el enunciado---
 FROM film
 WHERE release_year BETWEEN 2005 AND 2010;
 
 
+-- 17. Encuentra el título de todas las películas que son de lamisma categoría que "Family"--
+SELECT *
+	FROM film_category;
+
+SELECT *
+	FROM category;
+    
+SELECT *
+	FROM film;   
+    
+    
+SELECT f.title, c.name -- 1er view del output --
+	FROM film AS f
+    INNER JOIN film_category AS f_c
+    USING (film_id)
+    INNER JOIN category AS c
+    USING (category_id)
+    WHERE c.name = "Family";
+    
+    
+-- ✅ query solución --  
+SELECT f.title AS Titulo -- elimino la vista de la categoria para estar mas acorde con lo que pide el anunciado --
+	FROM film AS f
+    INNER JOIN film_category AS f_c
+    USING (film_id)
+    INNER JOIN category AS c
+    USING (category_id)
+    WHERE c.name = "Family";
+    
+    
+-- 18. Muestra el nombre y apellido de los actores que aparecen en más de 10 películas --
+   
+SELECT a.first_name AS Nombre, a.last_name AS Apellido, COUNT(film_id)   -- 1er view del output --
+   FROM actor AS a
+	INNER JOIN film_actor AS f_c
+    USING (actor_id)
+    WHERE film_id > 10
+    GROUP BY  a.first_name, a.last_name;
+   
+-- ✅ query solución --    
+SELECT a.first_name AS Nombre, a.last_name AS Apellido, COUNT(film_id) AS Total_Peliculas -- corrijo el where que no sirve para darme la info que quiero-
+	FROM actor AS a
+	INNER JOIN film_actor AS f_c 
+    USING (actor_id)
+	GROUP BY a.first_name, a.last_name
+	HAVING COUNT(film_id) > 10;
+
+-- ✅ query solución -- 
+SELECT a.first_name AS Nombre, a.last_name AS Apellido -- corrijo el where que no sirve para darme la info que quiero y corrijo el select-
+	FROM actor AS a
+	INNER JOIN film_actor AS f_c 
+    USING (actor_id)
+	GROUP BY a.first_name, a.last_name
+	HAVING COUNT(film_id) > 10;
+
+-- 19. Encuentra el titulo de todas las pelis que son "R" y tienen una duracion mayor a 2 horas, tabla film --
+SELECT *
+	FROM film;
+
+SELECT title AS Titulo, rating, length -- 1er View para validar--
+	FROM film
+    WHERE rating = "r" AND length > 120;
+    
+-- ✅ query solución --   
+SELECT title AS Titulo -- Dejo solo el titulo de la peli en el select para estar mas acorde con el anunciado--
+	FROM film
+    WHERE rating = "r" AND length > 120;
+
+
+-- 20. categoria de peliculas que  tienen un promedio de duración superior a 120 minutos y muestra el nombre de la categoría junto con el promedio de duración --   
+  SELECT *
+	FROM film_category;
+
+SELECT *
+	FROM category;
+    
+SELECT *
+	FROM film;     
+    
+SELECT c.name, f.length -- 1er view del output--
+	FROM category AS c
+    INNER JOIN film_category
+    USING (category_id)
+    INNER JOIN film AS f
+    USING (film_id);
+    
+SELECT c.name -- 2do view --
+	FROM category AS c
+    INNER JOIN film_category
+    USING (category_id)
+    INNER JOIN film AS f
+    USING (film_id)
+	WHERE AVG(f.length) > 120
+    GROUP BY c.name, f.length;
+
+-- ✅ query solución --      
+SELECT c.name AS Categoria, AVG(f.length) AS Duracion_Promedio -- 3er view: correcion de where y group by --
+	FROM category AS c
+	INNER JOIN film_category 
+    USING (category_id)
+	INNER JOIN film AS f 
+    USING (film_id)
+	GROUP BY c.name
+	HAVING AVG(f.length) > 120;
+    
+-- 21. actores que han actuado en al menos 5 pelis. muestra el nombre y la cantidad de pelis --
+
+SELECT a.first_name AS Nombre, a.last_name AS Apellido, COUNT(film_id) AS Total_Peliculas 
+	FROM actor AS a
+	INNER JOIN film_actor AS f_c 
+    USING (actor_id)
+	GROUP BY a.first_name, a.last_name
+	HAVING COUNT(film_id) > 5;
+
+
+-- 22. titulo de las pelis alquiladas por mas de 5 dias con subconsulta para encontrar rental_id con duracion superior a 5 dias y luego selecciona las pelis correspondientes-
+SELECT *
+	FROM film;
+    
+SELECT *
+	FROM rental;
+   
+SELECT title AS Pelicula, rental_duration AS Tiempo_ALquiler -- 1ra consulta --
+	FROM film
+    WHERE rental_duration > 5;
+    
+SELECT r.rental_id, f.rental_duration -- 2da consulta --
+	FROM rental AS r
+    INNER JOIN inventory AS i
+    USING (inventory_id)
+    INNER JOIN film AS f
+    USING (film_id)
+    WHERE rental_duration > 5;
+    
+
+SELECT title AS Pelicula, rental_duration AS Tiempo_Alquiler  -- 3ra consulta--
+	FROM film
+    WHERE rental_duration > (SELECT f.rental_duration 
+									FROM rental AS r
+									INNER JOIN inventory AS i
+									USING (inventory_id)
+									INNER JOIN film AS f
+									USING (film_id)
+									WHERE rental_duration > 5)
+ORDER BY title;
+
+    
+
+-- ✅ query solución --
+SELECT title AS Pelicula  -- corrección del where en la subconsulta para usar la tabla soliciada en el enunciado  --
+	FROM film
+    WHERE rental_duration IN (SELECT f.rental_duration 
+									FROM rental AS r
+									INNER JOIN inventory AS i
+									USING (inventory_id)
+									INNER JOIN film AS f
+									USING (film_id)
+									WHERE DATEDIFF(r.return_date, r.rental_date) > 5)
+ORDER BY title;
+  
+
+-- 23. 
